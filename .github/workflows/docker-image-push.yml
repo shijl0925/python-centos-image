@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: centos7
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       max-parallel: 2
