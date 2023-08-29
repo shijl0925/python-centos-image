@@ -22,12 +22,12 @@ jobs:
           - centos_version: "7.9.2009"
             python_version: "3.12.0rc1"
             experimental: true
-          - centos_version: "7.9.2009"
-            python_version: "3.6.15"
-            experimental: true
-          - centos_version: "7.9.2009"
-            python_version: "3.7.17"
-            experimental: true
+          #- centos_version: "7.9.2009"
+          #  python_version: "3.6.15"
+          #  experimental: true
+          #- centos_version: "7.9.2009"
+          #  python_version: "3.7.17"
+          #  experimental: true
           - centos_version: "7.9.2009"
             python_version: "3.10.12"
             experimental: true
