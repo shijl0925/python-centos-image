@@ -4,7 +4,7 @@ FROM centos:${CENTOS_VERSION}
 
 ARG QUICK_BUILD="false"
 ARG PYTHON_VERSION=3.11.5
-ARG OPENSSL_VERSION="3.1.2"
+ARG OPENSSL_VERSION="3.1.1"
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
@@ -23,7 +23,7 @@ RUN yum -y update && yum -y upgrade
 
 RUN yum install -y epel-release && \
     yum install -y wget make gcc openssl openssl-devel bzip2-devel htop tmux libffi-devel \
-  sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel tk-devel uuid-devel
+  sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel tk-devel uuid-devel perl nss-devel zlib-devel
 
 RUN yum groupinstall -y 'Development Tools'
 
