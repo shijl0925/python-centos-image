@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "CENTOS_VERSION: ${CENTOS_VERSION}"
+echo "PYTHON_VERSION: ${PYTHON_VERSION}"
+echo "QUICK_BUILD: ${QUICK_BUILD}"
+
 # Build the corresponding image
 docker build . \
   --file ./src/Dockerfile \
