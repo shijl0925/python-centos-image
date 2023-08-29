@@ -23,10 +23,10 @@ RUN yum install -y epel-release && \
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 
-RUN curl -L -o Python-$PYTHON_VERSION.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tgz && \
-    tar -xzf Python-$PYTHON_VERSION.tgz -C /opt/ && \
-    rm Python-$PYTHON_VERSION.tgz && \
-    cd /opt/Python-$PYTHON_VERSION/ && \
+RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
+    tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
+    rm Python-${PYTHON_VERSION}.tgz && \
+    cd /opt/Python-${PYTHON_VERSION}/ && \
     export CFLAGS=$(pkg-config --cflags openssl11) && \
     export LDFLAGS=$(pkg-config --libs openssl11) && \
     if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
