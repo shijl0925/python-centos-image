@@ -28,14 +28,14 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    export CFLAGS=$(pkg-config --cflags openssl11) && \
-    export LDFLAGS=$(pkg-config --libs openssl11) && \
+    if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then export CFLAGS=$(pkg-config --cflags openssl11); && export LDFLAGS=$(pkg-config --libs openssl11); fi && \
     if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
     ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared ${OPTIMIZATION} && \
     nproc="$(nproc)" && \
     make -j "$nproc" && \
     make altinstall && \
-    if [ -f "/usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0" ] ; then ln -sfn /usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0 /usr/lib64/libpython${PYTHON_VERSION%.*}.so.1.0; fi  && \
+    if [ -f "/usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0" ] ; then ln -sfn /usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0 /usr/lib64/libpython${PYTHON_VERSION%.*}.so.1.0; fi && \
+    if [ -f "/usr/local/lib/libpython${PYTHON_VERSION%.*}m.so.1.0" ] ; then ln -sfn /usr/local/lib/libpython${PYTHON_VERSION%.*}m.so.1.0 /usr/lib64/libpython${PYTHON_VERSION%.*}m.so.1.0; fi && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*} /usr/bin/python3 && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*}-config /usr/bin/python3-config && \
     ln -sfn /usr/local/bin/pip${PYTHON_VERSION%.*} /usr/bin/pip3 && \
