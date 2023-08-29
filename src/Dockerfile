@@ -1,98 +1,47 @@
-ARG CENTOS_VERSION
-
-FROM quay.io/centos/centos:stream${CENTOS_VERSION} as base_image
-RUN dnf -y update && dnf -y upgrade
-
-FROM base_image as building_image
-RUN dnf groupinstall -y "Development Tools"
-RUN dnf install -y \
-  bzip2-devel \
-  libffi-devel \
-  ncurses-devel \
-  nss-devel \
-  perl \
-  sqlite-devel \
-  wget \
-  zlib-devel
-
-ARG OPENSSL_VERSION="3.1.1"
+ARG CENTOS_VERSION=7
 ARG QUICK_BUILD="false"
-ARG PY_VERSION
+ARG PYTHON_VERSION=3.11.5
 
-RUN echo "Downloading sources"
+FROM centos:${CENTOS_VERSION}
 
-# BASE_PYTHON_VERSION: we strip the alpha, beta, rc, etc. For instance 3.11.0a3 -> 3.11.0 
-RUN export BASE_PYTHON_VERSION=`echo ${PY_VERSION} | sed -r "s/([0-9]+\.[0-9]+\.[0-9]+)([a-zA-Z]+[0-9]+)?/\1/"` && \
-  wget -cq https://www.python.org/ftp/python/${BASE_PYTHON_VERSION}/Python-${PY_VERSION}.tgz -O - | tar -xz && \
-  wget -cq https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -O - | tar -xz
+# ensure local python is preferred over distribution python
+ENV PATH /usr/local/bin:$PATH
 
-RUN echo "Building OpenSSL ${OPENSSL_VERSION}"
-WORKDIR /openssl-${OPENSSL_VERSION}
-# Make sure to use RPATH as specified at
-# https://wiki.openssl.org/index.php/Compilation_and_Installation#Using_RPATHs
-RUN ./config -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-RUN make --quiet
-RUN if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi
-RUN make --quiet install
+RUN localedef -c -f UTF-8 -i en_US en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
 
-RUN echo "Building Python ${PY_VERSION}"
-WORKDIR /Python-${PY_VERSION}
-# Make sure the env variable are correctly set for Python to be able
-# to link and compile against openSSL.
-ENV LDFLAGS "-L/usr/local/ssl/lib64/ -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib"
-ENV LD_LIBRARY_PATH "/usr/local/ssl/lib/:/usr/local/ssl/lib64/"
-ENV CPPFLAGS "-I/usr/local/ssl/include -I/usr/local/ssl/include/openssl"
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
-  ./configure \
-  --with-openssl=/usr/local/ssl \
-  --enable-loadable-sqlite-extensions \
-  --enable-shared \
-  --with-system-ffi \
-  --with-openssl-rpath=auto \
-  --disable-test-modules \
-  ${OPTIMIZATION}
-RUN make --quiet
-RUN make --quiet altinstall
-# We make sure to remove all the fluff
-# recipe taken from the official image https://github.com/docker-library/python/
-RUN find /usr/local -depth \
-  \( \
-  \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \
-  -o \
-  \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
-  \) -exec rm -rf '{}' +;
-# We also remove the headers and doc for openSSL as they are no longer needed.
-RUN rm -rf /usr/local/ssl/share /usr/local/ssl/include
+USER root
+WORKDIR /root
 
-FROM base_image
-RUN dnf install -y --setopt=install_weak_deps=False \
-  bzip2 \
-  ca-certificates \
-  libffi \
-  ncurses \
-  nss \
-  sqlite \
-  wget \
-  zlib && \
-  dnf clean dbcache && \
-  dnf clean all && \
-  dnf autoremove -y && \
-  rm -rf /var/cache/dnf
-COPY --from=building_image /usr/local/ /usr/local/
-ARG PY_VERSION
-ARG CREATION_COMMIT_SHA
-ENV LD_LIBRARY_PATH "/usr/local/ssl/lib/:/usr/local/ssl/lib64/"
-ENV CREATION_COMMIT_SHA ${CREATION_COMMIT_SHA}
-RUN echo "Python ${PY_VERSION} has been successfully installed and is accessible at /usr/local/bin/python3."
-# OpenSSL looks into ${OPENSSLDIR}/certs as CA trust store. By default this is
-# empty, and installing ca-certificates with apt-get populates it in the system
-# openssl at /usr/lib/ssl/certs/. Our compiled openssl looks into
-# /usr/local/ssl/certs, we create a symlink between the two to let Python access
-# the OS trust store.
-RUN rm -rf /usr/local/ssl/certs && ln -s /usr/lib/ssl/certs/ /usr/local/ssl/certs
+RUN yum install -y epel-release && \
+    yum install -y wget make gcc openssl openssl-devel bzip2-devel htop tmux libffi-devel sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel openssl11 openssl11-devel tk-devel uuid-devel && \
+    yum groupinstall -y 'Development Tools'
 
-WORKDIR /usr/local/bin/
-RUN ln -s python${PY_VERSION%.*} python \
-  && ln -s python${PY_VERSION%.*} python3
-CMD ["/usr/local/bin/python3"]
+RUN echo "Building Python ${PYTHON_VERSION}"
+
+RUN curl -L -o Python-$PYTHON_VERSION.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tgz && \
+    tar -xzf Python-$PYTHON_VERSION.tgz -C /opt/ && \
+    rm Python-$PYTHON_VERSION.tgz && \
+    cd /opt/Python-$PYTHON_VERSION/ && \
+    export CFLAGS=$(pkg-config --cflags openssl11) && \
+    export LDFLAGS=$(pkg-config --libs openssl11) && \
+    if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
+    ./configure --with-system-ffi --with-computed-gotos --enable-loadable-sqlite-extensions --enable-shared ${OPTIMIZATION} && \
+    nproc="$(nproc)" && \
+    make -j "$nproc" && \
+    make altinstall && \
+    ln -sfn /usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0 /usr/lib64/libpython${PYTHON_VERSION%.*}.so.1.0 && \
+    ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*} /usr/bin/python3 && \
+    ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*}-config /usr/bin/python3-config && \
+    ln -sfn /usr/local/bin/pip${PYTHON_VERSION%.*} /usr/bin/pip3 && \
+    rm -rf /opt/Python-$PYTHON_VERSION
+
+RUN echo "Python ${PYTHON_VERSION} has been successfully installed and is accessible at /usr/local/bin/python3."
+
+RUN yum install --nogpgcheck -y unzip mysql-devel git vim && \
+    yum clean all && \
+    yum autoremove -y
