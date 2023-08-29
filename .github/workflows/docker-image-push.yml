@@ -4,16 +4,13 @@ on:
   push:
     branches: [main]
 
-env:
-  OPENSSL_VERSION: 3.1.1
-
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        centos_version: ["8", "9"]
-        python_version: ["3.10.11", "3.11.4", "3.12.0b4"]
+        centos_version: ["7.9.2009", "8.4.2105"]
+        python_version: ["3.10.12", "3.11.5", "3.12.0b4"]
     env:
       CENTOS_VERSION: ${{ matrix.centos_version }}
       PYTHON_VERSION: ${{ matrix.python_version }}
@@ -32,8 +29,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push the Image
         run: |
-          docker push ${DOCKERHUB_USERNAME}/centos-stream${CENTOS_VERSION}-python:${PYTHON_VERSION}
-      - name: Retag to major.minor only (e.g. centos-stream9-python:3.10)
-        run: |
-          docker tag ${DOCKERHUB_USERNAME}/centos-stream${CENTOS_VERSION}-python:${PYTHON_VERSION} ${DOCKERHUB_USERNAME}/centos-stream${CENTOS_VERSION}-python:${PYTHON_VERSION%.*}
-          docker push ${DOCKERHUB_USERNAME}/centos-stream${CENTOS_VERSION}-python:${PYTHON_VERSION%.*}
+          docker push ${DOCKERHUB_USERNAME}/centos-${CENTOS_VERSION}-python:${PYTHON_VERSION}
