@@ -8,13 +8,12 @@ ARG PYTHON_VERSION=3.11.5
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
-# RUN yum -y install glibc-locale-source glibc-langpack-en
-# RUN localedef -c -f UTF-8 -i en_US en_US.UTF-8
+RUN localedef -c -f UTF-8 -i en_US en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 
-# ENV TZ=Asia/Shanghai
-# RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 USER root
 WORKDIR /root
