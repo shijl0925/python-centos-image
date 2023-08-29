@@ -1,8 +1,9 @@
 ARG CENTOS_VERSION=7
-ARG QUICK_BUILD="false"
-ARG PYTHON_VERSION=3.11.5
 
 FROM centos:${CENTOS_VERSION}
+
+ARG QUICK_BUILD="false"
+ARG PYTHON_VERSION=3.11.5
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
