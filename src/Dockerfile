@@ -28,7 +28,8 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then export CFLAGS=$(pkg-config --cflags openssl11); && export LDFLAGS=$(pkg-config --libs openssl11); fi && \
+    if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then export CFLAGS=$(pkg-config --cflags openssl11); fi && \
+    if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then export LDFLAGS=$(pkg-config --libs openssl11); fi && \
     if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
     ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared ${OPTIMIZATION} && \
     nproc="$(nproc)" && \
