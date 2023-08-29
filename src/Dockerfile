@@ -4,7 +4,7 @@ FROM centos:${CENTOS_VERSION}
 
 ARG QUICK_BUILD="false"
 ARG PYTHON_VERSION=3.11.5
-ARG OPENSSL_VERSION="3.1.1"
+ARG OPENSSL_VERSION="3.1.2"
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
