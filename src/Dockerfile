@@ -23,7 +23,8 @@ RUN yum -y update && yum -y upgrade
 
 RUN yum install -y epel-release && \
     yum install -y wget make gcc openssl openssl-devel bzip2-devel htop tmux libffi-devel \
-  sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel tk-devel uuid-devel perl nss-devel zlib-devel perl-IPC-Cmd
+  sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel openssl11 openssl11-devel \
+  tk-devel uuid-devel perl nss-devel zlib-devel perl-IPC-Cmd
 
 RUN yum groupinstall -y 'Development Tools'
 
@@ -34,18 +35,17 @@ RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/
     cd /opt/openssl-${OPENSSL_VERSION}/ && \
     ./config --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
     make && \
-    make install 
-
-RUN if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then export LD_LIBRARY_PATH=/usr/local/openssl-${OPENSSL_VERSION}/lib:$LD_LIBRARY_PATH; fi
+    make install
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then OPENSSLAGS="--with-openssl=/usr/local/openssl-${OPENSSL_VERSION}"; else OPENSSLAGS="" ; fi && \
+    if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then export CFLAGS=$(pkg-config --cflags openssl11); fi && \
+    if [ "${PYTHON_VERSION%.*}" == "3.10" ] || [ "${PYTHON_VERSION%.*}" == "3.11" ] || [ "${PYTHON_VERSION%.*}" == "3.12" ] ; then export LDFLAGS=$(pkg-config --libs openssl11); fi && \
     if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
-    ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared ${OPTIMIZATION} ${OPENSSLAGS} && \
+    ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared ${OPTIMIZATION} && \
     nproc="$(nproc)" && \
     make -j "$nproc" && \
     make altinstall && \
