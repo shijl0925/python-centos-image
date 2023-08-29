@@ -7,6 +7,13 @@ FROM centos:${CENTOS_VERSION}
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
+RUN localedef -c -f UTF-8 -i en_US en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 USER root
 WORKDIR /root
 
