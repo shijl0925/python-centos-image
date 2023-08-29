@@ -23,7 +23,7 @@ RUN yum -y update && yum -y upgrade
 
 RUN yum install -y epel-release && \
     yum install -y wget make gcc openssl openssl-devel bzip2-devel htop tmux libffi-devel \
-  sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel tk-devel uuid-devel perl nss-devel zlib-devel
+  sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel tk-devel uuid-devel perl nss-devel zlib-devel perl-IPC-Cmd
 
 RUN yum groupinstall -y 'Development Tools'
 
