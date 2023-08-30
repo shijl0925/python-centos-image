@@ -37,7 +37,7 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
     ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules ${OPTIMIZATION} && \
     nproc="$(nproc)" && \
-    make -j "$nproc" && \
+    make && \
     make altinstall && \
     if [ -f "/usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0" ] ; then ln -sfn /usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0 /usr/lib64/libpython${PYTHON_VERSION%.*}.so.1.0; fi && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*} /usr/bin/python3 && \
