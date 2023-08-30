@@ -33,7 +33,7 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
     ./configure ${OPTIMIZATION} && \
     nproc="$(nproc)" && \
-    make -j "$nproc" && \
+    make && \
     make altinstall && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*} /usr/bin/python3 && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*}-config /usr/bin/python3-config && \
