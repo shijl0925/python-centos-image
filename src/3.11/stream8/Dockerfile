@@ -17,13 +17,13 @@ RUN dnf install -y \
 
 ARG OPENSSL_VERSION="3.1.1"
 ARG QUICK_BUILD="false"
-ARG PY_VERSION
+ARG PYTHON_VERSION
 
 RUN echo "Downloading sources"
 
 # BASE_PYTHON_VERSION: we strip the alpha, beta, rc, etc. For instance 3.11.0a3 -> 3.11.0 
-RUN export BASE_PYTHON_VERSION=`echo ${PY_VERSION} | sed -r "s/([0-9]+\.[0-9]+\.[0-9]+)([a-zA-Z]+[0-9]+)?/\1/"` && \
-  wget -cq https://www.python.org/ftp/python/${BASE_PYTHON_VERSION}/Python-${PY_VERSION}.tgz -O - | tar -xz && \
+RUN export BASE_PYTHON_VERSION=`echo ${PYTHON_VERSION} | sed -r "s/([0-9]+\.[0-9]+\.[0-9]+)([a-zA-Z]+[0-9]+)?/\1/"` && \
+  wget -cq https://www.python.org/ftp/python/${BASE_PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz -O - | tar -xz && \
   wget -cq https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -O - | tar -xz
 
 RUN echo "Building OpenSSL ${OPENSSL_VERSION}"
@@ -35,8 +35,8 @@ RUN make --quiet
 RUN if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi
 RUN make --quiet install
 
-RUN echo "Building Python ${PY_VERSION}"
-WORKDIR /Python-${PY_VERSION}
+RUN echo "Building Python ${PYTHON_VERSION}"
+WORKDIR /Python-${PYTHON_VERSION}
 # Make sure the env variable are correctly set for Python to be able
 # to link and compile against openSSL.
 ENV LDFLAGS "-L/usr/local/ssl/lib64/ -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib"
@@ -93,6 +93,6 @@ RUN echo "Python ${PY_VERSION} has been successfully installed and is accessible
 RUN rm -rf /usr/local/ssl/certs && ln -s /usr/lib/ssl/certs/ /usr/local/ssl/certs
 
 WORKDIR /usr/local/bin/
-RUN ln -s python${PY_VERSION%.*} python \
-  && ln -s python${PY_VERSION%.*} python3
+RUN ln -s python${PYTHON_VERSION%.*} python \
+  && ln -s python${PYTHON_VERSION%.*} python3
 CMD ["/usr/local/bin/python3"]
