@@ -9,11 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
-      max-parallel: 2
+      # max-parallel: 2
       fail-fast: true
       matrix:
-        centos_version: ["7"]
-        python_version: ["3.6.15", "3.7.17", "3.10.12", "3.11.4"]
         experimental: [false]
         include:
           - centos_version: "7"
@@ -22,7 +20,18 @@ jobs:
           - centos_version: "7"
             python_version: "3.11.5"
             experimental: true
-
+          - centos_version: "7"
+            python_version: "3.11.4"
+            experimental: true
+          - centos_version: "7"
+            python_version: "3.10.12"
+            experimental: true
+          - centos_version: "7"
+            python_version: "3.7.17"
+            experimental: true
+          - centos_version: "7"
+            python_version: "3.6.15"
+            experimental: true
     env:
       CENTOS_VERSION: ${{ matrix.centos_version }}
       PYTHON_VERSION: ${{ matrix.python_version }}
