@@ -12,6 +12,8 @@ jobs:
       # max-parallel: 2
       fail-fast: true
       matrix:
+        centos_version: ["7"]
+        python_version: ["3.11.4"]
         experimental: [false]
         include:
           - centos_version: "7"
@@ -19,9 +21,6 @@ jobs:
             experimental: true
           - centos_version: "7"
             python_version: "3.11.5"
-            experimental: true
-          - centos_version: "7"
-            python_version: "3.11.4"
             experimental: true
           - centos_version: "7"
             python_version: "3.10.12"
