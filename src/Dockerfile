@@ -4,7 +4,7 @@ FROM centos:${CENTOS_VERSION}
 
 ARG QUICK_BUILD="false"
 ARG PYTHON_VERSION=3.11.5
-ARG OPENSSL_VERSION="3.1.1"
+# ARG OPENSSL_VERSION="3.1.1"
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
@@ -28,14 +28,14 @@ RUN yum install -y epel-release && \
 
 RUN yum groupinstall -y 'Development Tools'
 
-RUN echo "Building openssl ${OPENSSL_VERSION}"
-RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
-    tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
-    rm openssl-${OPENSSL_VERSION}.tar.gz && \
-    cd /opt/openssl-${OPENSSL_VERSION}/ && \
-    ./config --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
-    make && \
-    make install
+# RUN echo "Building openssl ${OPENSSL_VERSION}"
+# RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
+#     tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
+#     rm openssl-${OPENSSL_VERSION}.tar.gz && \
+#     cd /opt/openssl-${OPENSSL_VERSION}/ && \
+#     ./config --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
+#     make && \
+#     make install
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
