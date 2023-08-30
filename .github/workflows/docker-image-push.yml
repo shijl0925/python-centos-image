@@ -31,6 +31,10 @@ jobs:
           - centos_version: "7"
             python_version: "3.12.0rc1"
             experimental: true
+          - centos_version: "stream8"
+            python_version: "3.11.5"
+            experimental: true
+
     env:
       CENTOS_VERSION: ${{ matrix.centos_version }}
       PYTHON_VERSION: ${{ matrix.python_version }}
