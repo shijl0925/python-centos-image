@@ -16,7 +16,7 @@ RUN dnf install -y \
   zlib-devel
 
 ARG OPENSSL_VERSION="3.1.1"
-ARG QUICK_BUILD="false"
+ARG QUICK_BUILD
 ARG PYTHON_VERSION
 
 RUN echo "Downloading sources"

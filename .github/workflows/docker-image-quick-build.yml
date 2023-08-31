@@ -2,12 +2,12 @@ name: Docker Image CI
 
 on:
   push:
-    branches-ignore: [main]
+    branches-ignore: [main, dev]
   pull_request:
     branches: [main]
 
 env:
-  QUICK_BUILD: true
+  QUICK_BUILD: flase
 
 jobs:
   build:

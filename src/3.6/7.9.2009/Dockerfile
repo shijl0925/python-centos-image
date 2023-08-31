@@ -1,8 +1,8 @@
-ARG CENTOS_VERSION=7
+ARG CENTOS_VERSION
 
 FROM centos:${CENTOS_VERSION}
 
-ARG QUICK_BUILD="false"
+ARG QUICK_BUILD
 ARG PYTHON_VERSION
 
 # ensure local python is preferred over distribution python
@@ -30,10 +30,9 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
-    ./configure ${OPTIMIZATION} && \
-    nproc="$(nproc)" && \
+    ./configure --enable-optimizations && \
     make && \
+    if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make altinstall && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*} /usr/bin/python3 && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*}-config /usr/bin/python3-config && \
