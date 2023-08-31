@@ -23,9 +23,6 @@ jobs:
             python_version: "3.10.12"
             experimental: true
           - centos_version: "7"
-            python_version: "3.11.4"
-            experimental: true
-          - centos_version: "7"
             python_version: "3.11.5"
             experimental: true
           - centos_version: "7"
@@ -53,7 +50,6 @@ jobs:
         run: |
           docker push ${DOCKERHUB_USERNAME}/centos-${CENTOS_VERSION}-python:${PYTHON_VERSION}
       - name: Retag to major.minor only (e.g. centos-7-python:3.11)
-        if: ${{ matrix.python_version != '3.11.4' }}
         run: |
           docker tag ${DOCKERHUB_USERNAME}/centos-${CENTOS_VERSION}-python:${PYTHON_VERSION} ${DOCKERHUB_USERNAME}/centos-${CENTOS_VERSION}-python:${PYTHON_VERSION%.*}
           docker push ${DOCKERHUB_USERNAME}/centos-${CENTOS_VERSION}-python:${PYTHON_VERSION%.*}

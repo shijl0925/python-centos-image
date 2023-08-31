@@ -25,9 +25,6 @@ jobs:
             python_version: "3.10.12"
             experimental: true
           - centos_version: "7"
-            python_version: "3.11.4"
-            experimental: true
-          - centos_version: "7"
             python_version: "3.11.5"
             experimental: true
           - centos_version: "7"
