@@ -1,8 +1,8 @@
-ARG CENTOS_VERSION=7
+ARG CENTOS_VERSION
 
 FROM centos:${CENTOS_VERSION}
 
-ARG QUICK_BUILD="false"
+ARG QUICK_BUILD
 ARG PYTHON_VERSION
 ARG OPENSSL_VERSION="3.1.1"
 
@@ -28,14 +28,14 @@ RUN yum install -y epel-release && \
 
 RUN yum groupinstall -y 'Development Tools'
 
-RUN echo "Building openssl ${OPENSSL_VERSION}"
-RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
-    tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
-    rm openssl-${OPENSSL_VERSION}.tar.gz && \
-    cd /opt/openssl-${OPENSSL_VERSION}/ && \
-    ./config --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
-    make && \
-    make install
+#RUN echo "Building openssl ${OPENSSL_VERSION}"
+#RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
+#    tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
+#    rm openssl-${OPENSSL_VERSION}.tar.gz && \
+#    cd /opt/openssl-${OPENSSL_VERSION}/ && \
+#    ./config --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
+#    make && \
+#    make install
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
@@ -44,10 +44,9 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     cd /opt/Python-${PYTHON_VERSION}/ && \
     export CFLAGS=$(pkg-config --cflags openssl11) && \
     export LDFLAGS=$(pkg-config --libs openssl11) && \
-    if [ "${QUICK_BUILD}" = true ] ; then OPTIMIZATION="" ; else OPTIMIZATION="--enable-optimizations --with-lto"; fi && \
-    ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules ${OPTIMIZATION} && \
-    nproc="$(nproc)" && \
+    ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared --enable-optimizations --with-lto && \
     make && \
+    if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make altinstall && \
     if [ -f "/usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0" ] ; then ln -sfn /usr/local/lib/libpython${PYTHON_VERSION%.*}.so.1.0 /usr/lib64/libpython${PYTHON_VERSION%.*}.so.1.0; fi && \
     ln -sfn /usr/local/bin/python${PYTHON_VERSION%.*} /usr/bin/python3 && \
