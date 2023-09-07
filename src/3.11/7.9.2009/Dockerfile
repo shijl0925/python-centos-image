@@ -42,12 +42,12 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
 
 # We make sure to remove all the fluff
 # recipe taken from the official image https://github.com/docker-library/python/
-RUN find /usr/local -depth \
-  \( \
-  \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \
-  -o \
-  \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
-  \) -exec rm -rf '{}' +;
+# RUN find /usr/local -depth \
+#   \( \
+#   \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \
+#   -o \
+#   \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
+#   \) -exec rm -rf '{}' +;
 
 RUN echo "Python ${PYTHON_VERSION} has been successfully installed and is accessible at /usr/local/bin/python3."
 
