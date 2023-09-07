@@ -4,7 +4,7 @@ FROM centos:${CENTOS_VERSION}
 
 RUN yum -y update && yum -y upgrade
 
-RUN yum install -y epel-release && yum install -y wget make gcc openssl openssl11
+RUN yum install -y epel-release && yum install -y wget make gcc gcc-c++ openssl openssl11
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
