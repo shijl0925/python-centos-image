@@ -3,7 +3,7 @@ ARG CENTOS_VERSION
 FROM centos:${CENTOS_VERSION} as base_image
 
 RUN yum -y update && yum -y upgrade
-RUN yum install -y epel-release && yum install -y make gcc openssl openssl11
+RUN yum install -y epel-release && yum install -y make gcc gcc-c++ openssl openssl11
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
