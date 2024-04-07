@@ -1,6 +1,6 @@
-ARG CENTOS_VERSION as base_image
+ARG CENTOS_VERSION
 
-FROM centos:${CENTOS_VERSION}
+FROM centos:${CENTOS_VERSION} as base_image
 
 RUN yum -y update && yum -y upgrade
 
