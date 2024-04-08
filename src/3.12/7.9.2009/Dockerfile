@@ -49,7 +49,7 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    ./configure --with-openssl=/usr/local/ssl --with-system-ffi --with-openssl-rpath=auto --enable-loadable-sqlite-extensions --enable-shared --enable-optimizations --with-lto && \
+    ./configure --with-openssl=/usr/local/ssl --with-system-ffi --with-openssl-rpath=auto --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules --enable-optimizations --with-lto && \
     make && \
     if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make altinstall && \
