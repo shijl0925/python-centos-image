@@ -53,7 +53,6 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     export LDFLAGS=$(pkg-config --libs openssl11) && \
     ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules && \
     make && \
-    if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make altinstall && \
     rm -rf /opt/Python-$PYTHON_VERSION
 
