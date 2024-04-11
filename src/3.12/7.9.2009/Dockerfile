@@ -20,36 +20,38 @@ FROM base_image as building_image
 
 ARG QUICK_BUILD
 ARG PYTHON_VERSION
-ARG OPENSSL_VERSION="3.2.1"
+# ARG OPENSSL_VERSION="1.1.1w"
 
 RUN yum install -y epel-release && \
-    yum install -y bzip2-devel libffi-devel \
+    yum install -y openssl-devel bzip2-devel libffi-devel \
   sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel \
-  tk-devel uuid-devel perl nss-devel zlib-devel perl-IPC-Cmd
+  tk-devel uuid-devel perl nss-devel zlib-devel openssl11-devel perl-IPC-Cmd
 
 RUN yum groupinstall -y 'Development Tools'
 
-RUN echo "Building openssl ${OPENSSL_VERSION}"
-RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
-    tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
-    rm openssl-${OPENSSL_VERSION}.tar.gz && \
-    cd /opt/openssl-${OPENSSL_VERSION}/ && \
-    ./config -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/ssl --openssldir=/usr/local/ssl && \
-    make && \
-    make install
+# RUN echo "Building openssl ${OPENSSL_VERSION}"
+# RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
+#     tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
+#     rm openssl-${OPENSSL_VERSION}.tar.gz && \
+#     cd /opt/openssl-${OPENSSL_VERSION}/ && \
+#     ./config -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/ssl --openssldir=/usr/local/ssl && \
+#     make && \
+#     make install
 
 # Make sure the env variable are correctly set for Python to be able
 # to link and compile against openSSL.
-ENV LDFLAGS "-L/usr/local/ssl/lib64/ -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib"
-ENV LD_LIBRARY_PATH "/usr/local/ssl/lib/:/usr/local/ssl/lib64/"
-ENV CPPFLAGS "-I/usr/local/ssl/include -I/usr/local/ssl/include/openssl"
+# ENV LDFLAGS "-L/usr/local/ssl/lib64/ -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib"
+# ENV LD_LIBRARY_PATH "/usr/local/ssl/lib/:/usr/local/ssl/lib64/"
+# ENV CPPFLAGS "-I/usr/local/ssl/include -I/usr/local/ssl/include/openssl"
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    ./configure --with-openssl=/usr/local/ssl --with-system-ffi --with-openssl-rpath=auto --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules --enable-optimizations --with-lto && \
+    export CFLAGS=$(pkg-config --cflags openssl11) && \
+    export LDFLAGS=$(pkg-config --libs openssl11) && \
+    ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules && \
     make && \
     if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make altinstall && \
