@@ -34,7 +34,7 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
     cd /opt/Python-${PYTHON_VERSION}/ && \
     export CFLAGS=$(pkg-config --cflags openssl11) && \
     export LDFLAGS=$(pkg-config --libs openssl11) && \
-    ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules --enable-optimizations --with-lto && \
+    ./configure --with-system-ffi --enable-loadable-sqlite-extensions --enable-shared --disable-test-modules && \
     make && \
     make altinstall && \
     rm -rf /opt/Python-$PYTHON_VERSION
@@ -51,7 +51,7 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
 RUN echo "Python ${PYTHON_VERSION} has been successfully installed and is accessible at /usr/local/bin/python3."
 
 FROM base_image
-RUN yum install --nogpgcheck -y --setopt=install_weak_deps=False  \
+RUN yum install --nogpgcheck -y --setopt=install_weak_deps=False \
   unzip mysql-devel git vim && \
     yum clean all && \
     yum autoremove -y
