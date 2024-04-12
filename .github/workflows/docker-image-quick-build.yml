@@ -28,7 +28,7 @@ jobs:
             python_version: "3.11.9"
             experimental: true
           - centos_version: "7"
-            python_version: "3.12.2"
+            python_version: "3.12.3"
             experimental: true
 
     env:
