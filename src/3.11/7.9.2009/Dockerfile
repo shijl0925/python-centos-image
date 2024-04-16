@@ -17,7 +17,9 @@ RUN yum install -y epel-release && \
   perl \
   sqlite-devel \
   wget \
-  zlib-devel
+  zlib-devel \
+  openssl11-devel
+
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
@@ -44,6 +46,7 @@ RUN echo "Python ${PYTHON_VERSION} has been successfully installed and is access
 
 FROM base_image
 RUN yum install -y epel-release && yum install --nogpgcheck -y --setopt=install_weak_deps=False \
+  openssl11 \
   bzip2 \
   ca-certificates \
   libffi \

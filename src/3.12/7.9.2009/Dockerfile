@@ -17,7 +17,8 @@ RUN yum install -y epel-release && \
   perl \
   sqlite-devel \
   wget \
-  zlib-devel
+  zlib-devel \
+  openssl11-devel
 
 # ARG OPENSSL_VERSION="1.1.1w"
 # RUN echo "Building openssl ${OPENSSL_VERSION}"
@@ -60,6 +61,7 @@ RUN echo "Python ${PYTHON_VERSION} has been successfully installed and is access
 
 FROM base_image
 RUN yum install -y epel-release && yum install --nogpgcheck -y --setopt=install_weak_deps=False \
+  openssl11 \
   bzip2 \
   ca-certificates \
   libffi \
