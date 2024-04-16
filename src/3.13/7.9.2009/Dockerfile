@@ -26,23 +26,22 @@ RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/
     tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
     rm openssl-${OPENSSL_VERSION}.tar.gz && \
     cd /opt/openssl-${OPENSSL_VERSION}/ && \
-    ./config -Wl,-rpath=/usr/local/openssl-${OPENSSL_VERSION}/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
+    ./config -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/ssl --openssldir=/usr/local/ssl && \
     make && \
-    if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make install
 
 Make sure the env variable are correctly set for Python to be able
 to link and compile against openSSL.
-ENV LDFLAGS "-L/usr/local/openssl-${OPENSSL_VERSION}/lib64/ -Wl,-rpath=/usr/local/openssl-${OPENSSL_VERSION}/lib64:/usr/local/lib"
-ENV LD_LIBRARY_PATH "/usr/local/openssl-${OPENSSL_VERSION}/lib/:/usr/local/openssl-${OPENSSL_VERSION}/lib64/"
-ENV CPPFLAGS "-I/usr/local/openssl-${OPENSSL_VERSION}/include -I/usr/local/openssl-${OPENSSL_VERSION}/include/openssl"
+ENV LDFLAGS "-L/usr/local/ssl/lib64/ -Wl,-rpath=/usr/local/ssl/lib64:/usr/local/lib"
+ENV LD_LIBRARY_PATH "/usr/local/ssl/lib/:/usr/local/ssl/lib64/"
+ENV CPPFLAGS "-I/usr/local/ssl/include -I/usr/local/ssl/include/openssl"
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    ./configure --with-system-ffi --with-openssl=/usr/local/openssl-${OPENSSL_VERSION} --with-openssl-rpath=auto --enable-loadable-sqlite-extensions --enable-shared && \
+    ./configure --with-system-ffi --with-openssl=/usr/local/ssl --with-openssl-rpath=auto --enable-loadable-sqlite-extensions --enable-shared && \
     make && \
     if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make altinstall && \
