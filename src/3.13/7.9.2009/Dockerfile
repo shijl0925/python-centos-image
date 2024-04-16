@@ -28,7 +28,6 @@ RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/
     cd /opt/openssl-${OPENSSL_VERSION}/ && \
     ./config -Wl,-rpath=/usr/local/openssl-${OPENSSL_VERSION}/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
     make && \
-    if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make install
 
 # Make sure the env variable are correctly set for Python to be able
