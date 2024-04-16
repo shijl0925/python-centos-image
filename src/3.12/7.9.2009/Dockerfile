@@ -1,34 +1,25 @@
 ARG CENTOS_VERSION
 
 FROM centos:${CENTOS_VERSION} as base_image
-
 RUN yum -y update && yum -y upgrade
-
-RUN yum install -y epel-release && yum install -y wget make gcc gcc-c++ openssl openssl11
-
-# ensure local python is preferred over distribution python
-ENV PATH /usr/local/bin:$PATH
-
-RUN localedef -c -f UTF-8 -i en_US en_US.UTF-8
-ENV LC_ALL=en_US.UTF-8
-ENV LANG=en_US.UTF-8
-
-ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 FROM base_image as building_image
 
 ARG QUICK_BUILD
 ARG PYTHON_VERSION
-# ARG OPENSSL_VERSION="1.1.1w"
-
-RUN yum install -y epel-release && \
-    yum install -y openssl-devel bzip2-devel libffi-devel \
-  sqlite-devel readline-devel ncurses-devel gdbm-devel xz-devel \
-  tk-devel uuid-devel perl nss-devel zlib-devel openssl11-devel perl-IPC-Cmd
 
 RUN yum groupinstall -y 'Development Tools'
+RUN yum install -y epel-release && \
+  yum install -y bzip2-devel \
+  libffi-devel \
+  ncurses-devel \
+  nss-devel \
+  perl \
+  sqlite-devel \
+  wget \
+  zlib-devel
 
+# ARG OPENSSL_VERSION="1.1.1w"
 # RUN echo "Building openssl ${OPENSSL_VERSION}"
 # RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz && \
 #     tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
@@ -68,10 +59,17 @@ RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${
 RUN echo "Python ${PYTHON_VERSION} has been successfully installed and is accessible at /usr/local/bin/python3."
 
 FROM base_image
-RUN yum install --nogpgcheck -y --setopt=install_weak_deps=False \
-  unzip mysql-devel git vim && \
-    yum clean all && \
-    yum autoremove -y
+RUN yum install -y epel-release && yum install --nogpgcheck -y --setopt=install_weak_deps=False \
+  bzip2 \
+  ca-certificates \
+  libffi \
+  ncurses \
+  nss \
+  sqlite \
+  wget \
+  zlib && \
+  yum clean all && \
+  yum autoremove -y
 
 COPY --from=building_image /usr/local/ /usr/local/
 ARG PYTHON_VERSION
