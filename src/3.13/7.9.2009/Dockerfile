@@ -18,8 +18,7 @@ RUN yum install -y epel-release && \
   perl-IPC-Cmd \
   sqlite-devel \
   wget \
-  zlib-devel \
-  openssl11-devel
+  zlib-devel
 
 ARG OPENSSL_VERSION="3.2.1"
 RUN echo "Building openssl ${OPENSSL_VERSION}"
@@ -27,22 +26,22 @@ RUN curl -L -o openssl-${OPENSSL_VERSION}.tar.gz https://www.openssl.org/source/
     tar -xzf openssl-${OPENSSL_VERSION}.tar.gz -C /opt/ && \
     rm openssl-${OPENSSL_VERSION}.tar.gz && \
     cd /opt/openssl-${OPENSSL_VERSION}/ && \
-    ./config -Wl,-rpath=/usr/local/openssl-${OPENSSL_VERSION}/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/openssl-${OPENSSL_VERSION} --openssldir=/usr/local/openssl-${OPENSSL_VERSION} && \
+    ./config -Wl,-rpath=/usr/local/openssl/lib64:/usr/local/lib -Wl,--enable-new-dtags --prefix=/usr/local/openssl --openssldir=/usr/local/openssl && \
     make && \
     make install
 
 # Make sure the env variable are correctly set for Python to be able
 # to link and compile against openSSL.
-ENV LDFLAGS "-L/usr/local/openssl-${OPENSSL_VERSION}/lib64/ -Wl,-rpath=/usr/local/openssl-${OPENSSL_VERSION}/lib64:/usr/local/lib"
-ENV LD_LIBRARY_PATH "/usr/local/openssl-${OPENSSL_VERSION}/lib/:/usr/local/openssl-${OPENSSL_VERSION}/lib64/"
-ENV CPPFLAGS "-I/usr/local/openssl-${OPENSSL_VERSION}/include -I/usr/local/openssl-${OPENSSL_VERSION}/include/openssl"
+ENV LDFLAGS "-L/usr/local/openssl/lib64/ -Wl,-rpath=/usr/local/openssl/lib64:/usr/local/lib"
+ENV LD_LIBRARY_PATH "/usr/local/openssl/lib/:/usr/local/openssl/lib64/"
+ENV CPPFLAGS "-I/usr/local/openssl/include -I/usr/local/openssl/include/openssl"
 
 RUN echo "Building Python ${PYTHON_VERSION}"
 RUN curl -L -o Python-${PYTHON_VERSION}.tgz https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tgz && \
     tar -xzf Python-${PYTHON_VERSION}.tgz -C /opt/ && \
     rm Python-${PYTHON_VERSION}.tgz && \
     cd /opt/Python-${PYTHON_VERSION}/ && \
-    ./configure --with-system-ffi --with-openssl=/usr/local/openssl-${OPENSSL_VERSION} --with-openssl-rpath=auto --enable-loadable-sqlite-extensions --enable-shared && \
+    ./configure --with-system-ffi --with-openssl=/usr/local/openssl --with-openssl-rpath=auto --enable-loadable-sqlite-extensions --enable-shared && \
     make && \
     if [ ! "${QUICK_BUILD}" = true ] ; then make test; fi && \
     make altinstall && \
@@ -61,7 +60,6 @@ RUN echo "Python ${PYTHON_VERSION} has been successfully installed and is access
 
 FROM base_image
 RUN yum install -y epel-release && yum install --nogpgcheck -y --setopt=install_weak_deps=False \
-  openssl11 \
   bzip2 \
   ca-certificates \
   libffi \
