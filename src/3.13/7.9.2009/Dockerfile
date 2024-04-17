@@ -15,6 +15,7 @@ RUN yum install -y epel-release && \
   ncurses-devel \
   nss-devel \
   perl \
+  perl-IPC-Cmd \
   sqlite-devel \
   wget \
   zlib-devel \
